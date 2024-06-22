@@ -1,4 +1,5 @@
-let running = false;
+let intervalID;
+const initialSnake = [0, 1, 2, 3];
 
 function indexToCoords(index) {
   return [index % 10, Math.floor(index / 10)];
@@ -8,18 +9,29 @@ function coordsToIndex([x, y]) {
   return x + 10 * y;
 }
 
-function move(direction, currentSnake) {
-  switch (direction) {
+function move(dir, currentSnake) {
+  let snakeCopy = [...currentSnake].sort((a, b) => a - b);
+  let head;
+
+  switch (dir) {
     default:
     //fallthrough
     case "right":
-      return currentSnake.map((i) => i + 1);
+      snakeCopy.shift();
+      head = snakeCopy[snakeCopy.length - 1];
+      return [...snakeCopy, head + 1];
     case "left":
-      return currentSnake.map((i) => i - 1);
+      snakeCopy.pop();
+      head = snakeCopy[0];
+      return [...snakeCopy, head - 1];
     case "up":
-      return currentSnake.map((i) => i + 10);
+      snakeCopy.pop();
+      head = snakeCopy[0];
+      return [...snakeCopy, head - 10];
     case "down":
-      return currentSnake.map((i) => i - 10);
+      snakeCopy.shift();
+      head = snakeCopy[snakeCopy.length - 1];
+      return [...snakeCopy, head + 10];
   }
 }
 
@@ -39,7 +51,7 @@ const grid = document.getElementById("grid");
 let direction = "right";
 let pts = 0;
 let row = 0;
-let snake = new Set([0, 1, 2]);
+let snake = new Set(initialSnake);
 
 const startGameBtn = document.getElementById("startGame");
 const upBtn = document.getElementById("up");
@@ -60,7 +72,7 @@ startGameBtn.addEventListener("click", () => {
   direction = "right";
   pts = 0;
   row = 0;
-  snake = new Set([0, 1, 2]);
+  snake = new Set(initialSnake);
   startGame();
 });
 
@@ -78,7 +90,9 @@ rightBtn.addEventListener("click", () => {
 });
 
 const startGame = () => {
-  running = true;
+  if (intervalID) {
+    clearInterval(intervalID);
+  }
 
   for (let i = 0; i < 100; i++) {
     const div = document.createElement("div");
@@ -95,14 +109,7 @@ const startGame = () => {
   });
   // add any code you need to start the game
   // like setting the direction or helper functions to eat an apple
-
-  let intervalID;
   intervalID = setInterval(() => {
-    if (!running) {
-      clearInterval(intervalID);
-      return;
-    }
-
     snake = new Set(move(direction, Array.from(snake)));
     console.log(snake);
     repaint(snake);
