@@ -58,7 +58,7 @@ function move(dir, currentSnake, currentHeadIndex) {
 
   console.dir({ head, newHeadValue });
 
-  if (snakeCopy.includes(newHeadValue)) {
+  if (snakeCopy[snakeCopy.length - 2] === newHeadValue) {
     // reverse direction
     head = snakeCopy[0];
     newHeadValue = calcNewHeadValue(dir, head);
@@ -71,6 +71,10 @@ function move(dir, currentSnake, currentHeadIndex) {
       newHeadIndex: newSnake.length - 1,
       newSnake,
     };
+  } else if (snakeCopy.includes(newHeadValue)) {
+    clearInterval(intervalID);
+    intervalID = null;
+    alert("Game Over\nYour score " + pts);
   } else {
     snakeCopy.shift();
 
