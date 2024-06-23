@@ -21,17 +21,32 @@ function coordsToIndex([x, y]) {
 }
 
 function calcNewHeadValue(dir, head) {
+  let [x, y] = indexToCoords(head);
+  let newHead;
+
   switch (dir) {
     default:
     //fallthrough
     case "right":
-      return head + 1;
+      if (x + 1 >= gridSize) newHead = [0, y];
+      else newHead = [x + 1, y];
+
+      return coordsToIndex(newHead);
     case "left":
-      return head - 1;
+      if (x - 1 < 0) newHead = [gridSize - 1, y];
+      else newHead = [x - 1, y];
+
+      return coordsToIndex(newHead);
     case "up":
-      return head - gridSize;
+      if (y - 1 < 0) newHead = [x, gridSize - 1];
+      else newHead = [x, y - 1];
+
+      return coordsToIndex(newHead);
     case "down":
-      return head + gridSize;
+      if (y + 1 >= gridSize) newHead = [x, 0];
+      else newHead = [x, y + 1];
+
+      return coordsToIndex(newHead);
   }
 }
 
