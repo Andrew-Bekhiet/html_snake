@@ -14,6 +14,8 @@ And because I'm nerd I accepted the challenge and made it using HTML, CSS and Ja
 - You can go through the walls and appear on the other side
 - If you hit yourself, you die
 
+https://github.com/Andrew-Bekhiet/html_snake/assets/40571928/9a76af6f-0c3e-4640-b210-1cf3f186f973
+
 ## About me
 
 I'm actually a flutter developer, but I want to learn web dev, so I thought this would be a challenge to start with
