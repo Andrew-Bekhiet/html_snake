@@ -1,5 +1,13 @@
 let intervalID;
 const initialSnake = [0, 1, 2, 3];
+let direction = "right";
+let headIndex = 3;
+
+let pts = 0;
+let row = 0;
+let snake = new Set(initialSnake);
+
+const grid = document.getElementById("grid");
 
 function indexToCoords(index) {
   return [index % 10, Math.floor(index / 10)];
@@ -9,30 +17,38 @@ function coordsToIndex([x, y]) {
   return x + 10 * y;
 }
 
-function move(dir, currentSnake) {
-  let snakeCopy = [...currentSnake].sort((a, b) => a - b);
-  let head;
+function move(dir, currentSnake, currentHeadIndex) {
+  const head = currentSnake[currentSnake.length - 1];
 
+  let newHeadValue;
   switch (dir) {
     default:
     //fallthrough
     case "right":
-      snakeCopy.shift();
-      head = snakeCopy[snakeCopy.length - 1];
-      return [...snakeCopy, head + 1];
+      newHeadValue = head + 1;
+      break;
     case "left":
-      snakeCopy.pop();
-      head = snakeCopy[0];
-      return [...snakeCopy, head - 1];
+      newHeadValue = head - 1;
+      break;
     case "up":
-      snakeCopy.pop();
-      head = snakeCopy[0];
-      return [...snakeCopy, head - 10];
+      newHeadValue = head - 10;
+      break;
     case "down":
-      snakeCopy.shift();
-      head = snakeCopy[snakeCopy.length - 1];
-      return [...snakeCopy, head + 10];
+      newHeadValue = head + 10;
+      break;
   }
+
+  const sortingDir = currentSnake.includes(newHeadValue) ? -1 : 1;
+
+  let snakeCopy = [...currentSnake].sort((a, b) => (a - b) * sortingDir);
+
+  const newHeadIndex = sortingDir > 0 ? snakeCopy.length - 1 : 0;
+
+  snakeCopy.shift();
+  return [
+    newHeadIndex,
+    [...snakeCopy, newHeadValue].sort((a, b) => (a - b) * sortingDir),
+  ];
 }
 
 function repaint(snake) {
@@ -46,12 +62,6 @@ function repaint(snake) {
     }
   });
 }
-
-const grid = document.getElementById("grid");
-let direction = "right";
-let pts = 0;
-let row = 0;
-let snake = new Set(initialSnake);
 
 const startGameBtn = document.getElementById("startGame");
 const upBtn = document.getElementById("up");
@@ -110,8 +120,16 @@ const startGame = () => {
   // add any code you need to start the game
   // like setting the direction or helper functions to eat an apple
   intervalID = setInterval(() => {
-    snake = new Set(move(direction, Array.from(snake)));
-    console.log(snake);
+    let [newHeadIndex, newSnake] = move(
+      direction,
+      Array.from(snake),
+      headIndex
+    );
+
+    headIndex = newHeadIndex;
+    snake = new Set(newSnake);
+
+    console.dir({ newHeadIndex, newSnake });
     repaint(snake);
   }, 1000);
 };
