@@ -1,5 +1,7 @@
-let intervalID;
 const initialSnake = [0, 1, 2, 3];
+const gridSize = 20;
+
+let intervalID;
 let direction = "right";
 let headIndex = 3;
 
@@ -10,11 +12,11 @@ let snake = [...initialSnake];
 const grid = document.getElementById("grid");
 
 function indexToCoords(index) {
-  return [index % 10, Math.floor(index / 10)];
+  return [index % gridSize, Math.floor(index / gridSize)];
 }
 
 function coordsToIndex([x, y]) {
-  return x + 10 * y;
+  return x + gridSize * y;
 }
 
 function calcNewHeadValue(dir, head) {
@@ -26,9 +28,9 @@ function calcNewHeadValue(dir, head) {
     case "left":
       return head - 1;
     case "up":
-      return head - 10;
+      return head - gridSize;
     case "down":
-      return head + 10;
+      return head + gridSize;
   }
 }
 
@@ -98,7 +100,7 @@ function startGame() {
   row = 0;
   snake = [...initialSnake];
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < gridSize * gridSize; i++) {
     const div = document.createElement("div");
     div.classList.add("grid-space");
     grid.appendChild(div);
@@ -123,7 +125,7 @@ const leftBtn = document.getElementById("left");
 const rightBtn = document.getElementById("right");
 
 // create board
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < gridSize * gridSize; i++) {
   const div = document.createElement("div");
   div.classList.add("grid-space");
   grid.appendChild(div);
