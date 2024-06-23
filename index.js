@@ -103,6 +103,8 @@ function repaint(snake, appleIndex) {
       e.classList.remove("snaky", "apple");
     }
   });
+
+  document.getElementById("pts").innerHTML = pts;
 }
 
 function tick() {
