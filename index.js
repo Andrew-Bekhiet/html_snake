@@ -5,7 +5,7 @@ let headIndex = 3;
 
 let pts = 0;
 let row = 0;
-let snake = new Set(initialSnake);
+let snake = [...initialSnake];
 
 const grid = document.getElementById("grid");
 
@@ -17,45 +17,59 @@ function coordsToIndex([x, y]) {
   return x + 10 * y;
 }
 
-function move(dir, currentSnake, currentHeadIndex) {
-  const head = currentSnake[currentSnake.length - 1];
-
-  let newHeadValue;
+function calcNewHeadValue(dir, head) {
   switch (dir) {
     default:
     //fallthrough
     case "right":
-      newHeadValue = head + 1;
-      break;
+      return head + 1;
     case "left":
-      newHeadValue = head - 1;
-      break;
+      return head - 1;
     case "up":
-      newHeadValue = head - 10;
-      break;
+      return head - 10;
     case "down":
-      newHeadValue = head + 10;
-      break;
+      return head + 10;
   }
+}
 
-  const sortingDir = currentSnake.includes(newHeadValue) ? -1 : 1;
+function move(dir, currentSnake, currentHeadIndex) {
+  let snakeCopy = [...currentSnake];
 
-  let snakeCopy = [...currentSnake].sort((a, b) => (a - b) * sortingDir);
+  let head = snakeCopy[snakeCopy.length - 1];
+  let newHeadValue = calcNewHeadValue(dir, head);
 
-  const newHeadIndex = sortingDir > 0 ? snakeCopy.length - 1 : 0;
+  console.dir({ head, newHeadValue });
 
-  snakeCopy.shift();
-  return [
-    newHeadIndex,
-    [...snakeCopy, newHeadValue].sort((a, b) => (a - b) * sortingDir),
-  ];
+  if (snakeCopy.includes(newHeadValue)) {
+    // reverse direction
+    head = snakeCopy[0];
+    newHeadValue = calcNewHeadValue(dir, head);
+
+    snakeCopy.pop();
+
+    const newSnake = [newHeadValue, ...snakeCopy].reverse();
+
+    return {
+      newHeadIndex: newSnake.length - 1,
+      newSnake,
+    };
+  } else {
+    snakeCopy.shift();
+
+    const newSnake = [...snakeCopy, newHeadValue];
+
+    return {
+      newHeadIndex: newSnake.length - 1,
+      newSnake: newSnake,
+    };
+  }
 }
 
 function repaint(snake) {
   const allGridElems = document.querySelectorAll(".grid-space");
 
   allGridElems.forEach((e, i) => {
-    if (snake.has(i)) {
+    if (snake.includes(i)) {
       e.classList.add("snaky");
     } else {
       e.classList.remove("snaky");
@@ -63,46 +77,26 @@ function repaint(snake) {
   });
 }
 
-const startGameBtn = document.getElementById("startGame");
-const upBtn = document.getElementById("up");
-const downBtn = document.getElementById("down");
-const leftBtn = document.getElementById("left");
-const rightBtn = document.getElementById("right");
+function tick() {
+  let { newHeadIndex, newSnake } = move(direction, snake, headIndex);
 
-// create board
-for (let i = 0; i < 100; i++) {
-  const div = document.createElement("div");
-  div.classList.add("grid-space");
-  grid.appendChild(div);
+  headIndex = newHeadIndex;
+  snake = newSnake;
+
+  console.dir({ newHeadIndex, newSnake });
+  repaint(snake);
 }
 
-startGameBtn.addEventListener("click", () => {
-  // add your code here
+function startGame() {
+  if (intervalID) {
+    clearInterval(intervalID);
+  }
+
   grid.innerHTML = "";
   direction = "right";
   pts = 0;
   row = 0;
-  snake = new Set(initialSnake);
-  startGame();
-});
-
-upBtn.addEventListener("click", () => {
-  direction = "up";
-});
-downBtn.addEventListener("click", () => {
-  direction = "down";
-});
-leftBtn.addEventListener("click", () => {
-  direction = "left";
-});
-rightBtn.addEventListener("click", () => {
-  direction = "right";
-});
-
-const startGame = () => {
-  if (intervalID) {
-    clearInterval(intervalID);
-  }
+  snake = [...initialSnake];
 
   for (let i = 0; i < 100; i++) {
     const div = document.createElement("div");
@@ -119,17 +113,33 @@ const startGame = () => {
   });
   // add any code you need to start the game
   // like setting the direction or helper functions to eat an apple
-  intervalID = setInterval(() => {
-    let [newHeadIndex, newSnake] = move(
-      direction,
-      Array.from(snake),
-      headIndex
-    );
+  intervalID = setInterval(tick, 1000);
+}
 
-    headIndex = newHeadIndex;
-    snake = new Set(newSnake);
+const startGameBtn = document.getElementById("startGame");
+const upBtn = document.getElementById("up");
+const downBtn = document.getElementById("down");
+const leftBtn = document.getElementById("left");
+const rightBtn = document.getElementById("right");
 
-    console.dir({ newHeadIndex, newSnake });
-    repaint(snake);
-  }, 1000);
-};
+// create board
+for (let i = 0; i < 100; i++) {
+  const div = document.createElement("div");
+  div.classList.add("grid-space");
+  grid.appendChild(div);
+}
+
+startGameBtn.addEventListener("click", startGame);
+
+upBtn.addEventListener("click", () => {
+  direction = "up";
+});
+downBtn.addEventListener("click", () => {
+  direction = "down";
+});
+leftBtn.addEventListener("click", () => {
+  direction = "left";
+});
+rightBtn.addEventListener("click", () => {
+  direction = "right";
+});
