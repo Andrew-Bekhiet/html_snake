@@ -1,4 +1,4 @@
-const initialSnake = [0, 1, 2, 3];
+const initialSnake = [0, 1, 2];
 const gridSize = 20;
 
 let intervalID;
@@ -8,6 +8,7 @@ let headIndex = 3;
 let pts = 0;
 let row = 0;
 let snake = [...initialSnake];
+let appleIndex;
 
 const grid = document.getElementById("grid");
 
@@ -67,14 +68,39 @@ function move(dir, currentSnake, currentHeadIndex) {
   }
 }
 
-function repaint(snake) {
+function maybeEatApple(snake, appleIndex) {
+  if (snake.includes(appleIndex)) {
+    return {
+      newScore: pts + 1,
+      newAppleIndex: Math.floor(Math.random() * gridSize * gridSize),
+    };
+  } else {
+    return {
+      newScore: pts,
+      newAppleIndex: appleIndex,
+    };
+  }
+}
+
+function initGrid() {
+  for (let i = 0; i < gridSize * gridSize; i++) {
+    const div = document.createElement("div");
+    div.classList.add("grid-space");
+    grid.appendChild(div);
+  }
+}
+
+function repaint(snake, appleIndex) {
   const allGridElems = document.querySelectorAll(".grid-space");
 
   allGridElems.forEach((e, i) => {
     if (snake.includes(i)) {
       e.classList.add("snaky");
+      e.classList.remove("apple");
+    } else if (i === appleIndex) {
+      e.classList.add("apple");
     } else {
-      e.classList.remove("snaky");
+      e.classList.remove("snaky", "apple");
     }
   });
 }
@@ -86,7 +112,21 @@ function tick() {
   snake = newSnake;
 
   console.dir({ newHeadIndex, newSnake });
-  repaint(snake);
+
+  let { newScore, newAppleIndex } = maybeEatApple(snake, appleIndex);
+
+  appleIndex = newAppleIndex;
+  if (pts != newScore) {
+    pts = newScore;
+    let tail = snake[0];
+
+    let { newHeadIndex, newSnake } = move(direction, snake, headIndex);
+
+    snake = [tail, ...newSnake];
+    headIndex = newHeadIndex;
+  }
+
+  repaint(snake, appleIndex);
 }
 
 function startGame() {
@@ -99,12 +139,10 @@ function startGame() {
   pts = 0;
   row = 0;
   snake = [...initialSnake];
+  appleIndex = Math.floor(Math.random() * gridSize * gridSize);
 
-  for (let i = 0; i < gridSize * gridSize; i++) {
-    const div = document.createElement("div");
-    div.classList.add("grid-space");
-    grid.appendChild(div);
-  }
+  initGrid();
+  repaint(snake, appleIndex);
 
   const allGridElems = document.querySelectorAll(".grid-space");
 
