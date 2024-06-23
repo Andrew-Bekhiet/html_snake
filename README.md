@@ -1,6 +1,6 @@
 # Snake Game using HTML, CSS and JavaScript
 
-![wakapi.dev: total code time: 3 hrs 5 mins](wakapi.png)
+![wakapi.dev: total code time: 3 hrs 5 mins](docs/wakapi.png)
 
 ## [Click to play](https://codepen.io/andrew-bekhiet/pen/GRadyPQ)
 
