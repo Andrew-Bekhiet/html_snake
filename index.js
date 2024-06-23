@@ -113,7 +113,7 @@ function startGame() {
   });
   // add any code you need to start the game
   // like setting the direction or helper functions to eat an apple
-  intervalID = setInterval(tick, 1000);
+  intervalID = setInterval(tick, 500);
 }
 
 const startGameBtn = document.getElementById("startGame");
@@ -142,4 +142,21 @@ leftBtn.addEventListener("click", () => {
 });
 rightBtn.addEventListener("click", () => {
   direction = "right";
+});
+
+window.addEventListener("keydown", (e) => {
+  switch (e.key) {
+    case "ArrowUp":
+      direction = "up";
+      break;
+    case "ArrowDown":
+      direction = "down";
+      break;
+    case "ArrowLeft":
+      direction = "left";
+      break;
+    case "ArrowRight":
+      direction = "right";
+      break;
+  }
 });
